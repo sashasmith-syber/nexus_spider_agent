@@ -212,8 +212,16 @@ class DatabaseManager:
         if not self.connection:
             return None
         
+        # Validate table name to prevent SQL injection
+        # Table names must be alphanumeric with underscores only
+        if not re.match(r'^[a-zA-Z0-9_]+$', table_name):
+            print(f"Invalid table name: {table_name}")
+            return None
+        
         try:
             cursor = self.connection.cursor()
+            # PRAGMA statements don't support parameterized queries for table names
+            # We've validated the table name above to prevent injection
             cursor.execute(f"PRAGMA table_info({table_name})")
             columns = cursor.fetchall()
             

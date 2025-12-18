@@ -30,7 +30,9 @@ class LMStudioClient:
             True if connection is successful, False otherwise
         """
         try:
-            response = requests.get(f"{self.base_url}/models", timeout=5)
+            # Use a shorter timeout for connection checks
+            check_timeout = min(5, self.timeout)
+            response = requests.get(f"{self.base_url}/models", timeout=check_timeout)
             return response.status_code == 200
         except requests.exceptions.RequestException:
             return False

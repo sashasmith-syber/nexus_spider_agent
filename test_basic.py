@@ -11,9 +11,9 @@ def test_database_manager():
     """Test basic database manager functionality."""
     print("Testing DatabaseManager...")
     
-    # Create a temporary database
-    with tempfile.NamedTemporaryFile(delete=False, suffix='.db') as f:
-        db_path = f.name
+    # Create a temporary database using mkstemp for better cleanup
+    fd, db_path = tempfile.mkstemp(suffix='.db')
+    os.close(fd)  # Close the file descriptor
     
     try:
         # Initialize database manager
