@@ -66,4 +66,4 @@ jobs:
     
     - name: Check code formatting with black
       run: |
-        black --check nexus_spider_agent || true
+        black --check --diff nexus_spider_agent
