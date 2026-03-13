@@ -70,4 +70,4 @@ jobs:
     
     - name: Check code formatting with black
       run: |
-        black --check --diff nexus_spider_agent
+                black --check --diff --line-length 127 nexus_spider_agent
