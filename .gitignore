@@ -25,7 +25,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
+PIPFILE.lock
 
 # PyInstaller
 *.manifest
@@ -122,19 +122,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# IDEs
+# IDE specific
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Project specific
+config.json
 *.db
 *.sqlite
 *.sqlite3
-config.yaml
-config.yml
-data/
 logs/

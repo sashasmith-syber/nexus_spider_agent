@@ -1,219 +1,255 @@
-<div align="center">
+# Nexus Spider Agent
 
-# 🕷️ Nexus Spider Agent
+A lightweight, privacy-focused Python agent that connects to locally running LLMs in LM Studio to interpret natural language commands, generate SQL queries, and securely manage SQLite databases.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+## Features
 
-*A lightweight, privacy-focused Python agent that connects to locally running LLMs in LM Studio to interpret natural language commands, generate SQL queries, and securely manage SQLite databases.*
+- 🔒 **Privacy-Focused**: All processing happens locally - no data leaves your machine
+- 🤖 **LLM-Powered**: Leverages locally running LLMs via LM Studio for natural language understanding
+- 🛡️ **Secure**: Built-in SQL injection prevention and query validation
+- 🗃️ **SQLite Management**: Easy database operations with natural language
+- 💬 **Interactive CLI**: User-friendly command-line interface
+- 📝 **Query History**: Track your conversation and generated queries
 
-[Features](#-features) •
-[Installation](#-installation) •
-[Usage](#-usage) •
-[Documentation](#-documentation) •
-[Contributing](#-contributing) •
-[License](#-license)
+## Prerequisites
 
-</div>
+- Python 3.7 or higher
+- [LM Studio](https://lmstudio.ai/) installed and running locally
+- A language model loaded in LM Studio (e.g., Mistral, Llama, etc.)
 
----
+## Installation
 
-## 🌟 Features
-
-- **🔒 Privacy-First**: All processing happens locally with your own LLM - no data leaves your machine
-- **🤖 Natural Language Interface**: Interact with databases using plain English commands
-- **⚡ LM Studio Integration**: Seamlessly connects to locally running LLMs via LM Studio
-- **🗃️ SQLite Management**: Secure and efficient SQLite database operations
-- **🛡️ Safe Query Generation**: Built-in safeguards for SQL query validation
-- **📊 Database Insights**: Get intelligent insights about your data structure and content
-
-## 📋 Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Python 3.8+** - [Download Python](https://www.python.org/downloads/)
-- **LM Studio** - [Download LM Studio](https://lmstudio.ai/)
-- **SQLite3** - Usually pre-installed with Python
-
-## 🚀 Installation
-
-### Quick Start
-
+1. Clone the repository:
 ```bash
-# Clone the repository
 git clone https://github.com/sashasmith-syber/nexus_spider_agent.git
-
-# Navigate to the project directory
 cd nexus_spider_agent
+```
 
-# Install dependencies (once available)
+2. Install dependencies:
+```bash
 pip install -r requirements.txt
-
-# Run the agent
-python nexus_spider_agent.py
 ```
 
-### Development Installation
+## Quick Start
+
+1. **Start LM Studio**:
+   - Open LM Studio
+   - Load a model (recommended: a code-capable model like CodeLlama or Mistral)
+   - Start the local server (default: http://localhost:1234)
+
+2. **Run Nexus Spider Agent**:
+```bash
+python -m nexus_spider_agent
+```
+
+Or specify a custom database:
+```bash
+python -m nexus_spider_agent --db mydata.db
+```
+
+## Usage
+
+### Interactive CLI
+
+Once started, you can interact with the agent using natural language:
+
+```
+nexus> Show me all users
+Processing: Show me all users
+Generating SQL query...
+
+Generated Query:
+SELECT * FROM users
+
+Execute this query? (y/n): y
+
+Results:
+1. {
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com"
+}
+...
+```
+
+### Special Commands
+
+- `/execute <query>` - Execute a SQL query directly
+- `/schema [table]` - Show database schema (optionally for a specific table)
+- `/tables` - List all tables in the database
+- `/info <table>` - Show detailed information about a table
+- `/history` - Show conversation history
+- `/clear` - Clear conversation history
+- `/help` - Show help message
+- `/quit` or `/exit` - Exit the application
+
+### Command-Line Options
 
 ```bash
-# Clone the repository
-git clone https://github.com/sashasmith-syber/nexus_spider_agent.git
-cd nexus_spider_agent
+python -m nexus_spider_agent --help
 
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-
-# Install development dependencies
-pip install -r requirements-dev.txt
+Options:
+  --db DB                Path to SQLite database (default: database.db)
+  --lm-studio-url URL    LM Studio API URL (default: http://localhost:1234/v1)
+  --auto-execute         Automatically execute generated queries (use with caution)
 ```
 
-## 💡 Usage
+## Example Usage
 
-### Basic Example
+### Create a Table
+```
+nexus> Create a table called products with id, name, price, and description
+```
+
+### Insert Data
+```
+nexus> Insert a product with name "Laptop", price 999.99, and description "High-performance laptop"
+```
+
+### Query Data
+```
+nexus> Show me all products where price is less than 1000
+```
+
+### Update Data
+```
+nexus> Update the price of Laptop to 899.99
+```
+
+### Complex Queries
+```
+nexus> Show me the top 5 most expensive products with their names and prices
+```
+
+## Python API
+
+You can also use Nexus Spider Agent programmatically:
 
 ```python
-from nexus_spider_agent import NexusAgent
+from nexus_spider_agent import NexusSpiderAgent
 
-# Initialize the agent
-agent = NexusAgent(
-    lm_studio_url="http://localhost:1234",
-    database_path="./my_database.db"
+# Create agent
+agent = NexusSpiderAgent(
+    db_path="mydata.db",
+    lm_studio_url="http://localhost:1234/v1"
 )
 
-# Execute natural language queries
-response = agent.query("Show me all users who registered last month")
-print(response)
-
-# Get database insights
-insights = agent.analyze_database()
-print(insights)
+# Initialize
+success, message = agent.initialize()
+if success:
+    # Process natural language command
+    result = agent.process_command("Show me all users")
+    
+    if result["query"]:
+        print(f"Generated Query: {result['query']}")
+    
+    # Execute query directly
+    exec_result = agent.execute_query("SELECT * FROM users")
+    print(exec_result["results"])
+    
+    # Get schema
+    schema = agent.get_schema()
+    print(schema)
+    
+    # Clean up
+    agent.close()
 ```
 
-### Advanced Usage
+## Security Features
 
-```python
-# Connect to specific LLM model
-agent = NexusAgent(
-    lm_studio_url="http://localhost:1234",
-    model_name="mistral-7b-instruct",
-    database_path="./my_database.db",
-    safety_mode=True
-)
+### SQL Injection Prevention
+- Query validation before execution
+- Parameterized queries support
+- Multiple statement detection
+- Dangerous keyword blocking
 
-# Execute complex queries
-result = agent.query("""
-    Find the average purchase amount for customers 
-    who made more than 5 orders in the last quarter
-""")
+### Safe by Default
+- Auto-execute is disabled by default
+- User confirmation required for query execution
+- Dangerous operations (DROP DATABASE, etc.) are blocked
+- Comprehensive error handling
+
+## Configuration
+
+Copy `config.example.json` to `config.json` and customize:
+
+```json
+{
+  "database": {
+    "path": "database.db"
+  },
+  "lm_studio": {
+    "base_url": "http://localhost:1234/v1",
+    "timeout": 30
+  },
+  "security": {
+    "auto_execute": false
+  }
+}
 ```
 
-## 📚 Documentation
+## Architecture
 
-### Core Components
-
-- **NexusAgent**: Main interface for interacting with the agent
-- **QueryParser**: Interprets natural language and generates SQL
-- **DatabaseManager**: Handles secure database operations
-- **LLMConnector**: Manages communication with LM Studio
-
-### Configuration
-
-Create a `config.yaml` file to customize the agent:
-
-```yaml
-lm_studio:
-  url: "http://localhost:1234"
-  model: "mistral-7b-instruct"
-  timeout: 30
-
-database:
-  path: "./data/database.db"
-  read_only: false
-  
-safety:
-  enabled: true
-  max_query_length: 1000
-  allowed_operations: ["SELECT", "INSERT", "UPDATE"]
+```
+┌─────────────────┐
+│   User Input    │
+│ (Natural Lang)  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐      ┌──────────────┐
+│  Nexus Spider   │─────▶│  LM Studio   │
+│     Agent       │      │  (Local LLM) │
+└────────┬────────┘      └──────────────┘
+         │
+         ▼
+┌─────────────────┐      ┌──────────────┐
+│   DB Manager    │─────▶│   SQLite     │
+│  (Validation)   │      │   Database   │
+└─────────────────┘      └──────────────┘
 ```
 
-## 🛠️ Development
+## Components
 
-### Running Tests
+- **NexusSpiderAgent**: Main orchestrator that coordinates LLM and database operations
+- **LMStudioClient**: Handles communication with LM Studio's local API
+- **DatabaseManager**: Secure SQLite database operations with validation
+- **CLI**: Interactive command-line interface
 
-```bash
-# Run all tests
-pytest
+## Troubleshooting
 
-# Run with coverage
-pytest --cov=nexus_spider_agent
+### "Failed to connect to LM Studio"
+- Ensure LM Studio is running
+- Check that a model is loaded in LM Studio
+- Verify the server is started (check LM Studio's server tab)
+- Confirm the URL is correct (default: http://localhost:1234)
 
-# Run specific test file
-pytest tests/test_query_parser.py
-```
+### Queries Not Generating Correctly
+- Try a different model in LM Studio (code-capable models work best)
+- Be more specific in your natural language commands
+- Provide schema context by running `/schema` first
 
-### Code Style
+### Permission Errors
+- Check database file permissions
+- Ensure the database directory is writable
 
-This project uses [Black](https://github.com/psf/black) for code formatting and [Flake8](https://flake8.pycqa.org/) for linting.
+## Contributing
 
-```bash
-# Format code
-black .
+Contributions are welcome! Please feel free to submit issues or pull requests.
 
-# Run linter
-flake8 nexus_spider_agent/
-```
+## License
 
-## 🤝 Contributing
+This project is open source and available under the MIT License.
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to:
+## Privacy & Data
 
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Follow our code of conduct
+All processing happens locally on your machine:
+- No data is sent to external servers
+- No telemetry or tracking
+- No API keys required
+- Your database stays private
 
-## 🔒 Security
+## Acknowledgments
 
-Security is a top priority. If you discover a security vulnerability, please follow our [Security Policy](SECURITY.md).
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [LM Studio](https://lmstudio.ai/) - For providing an excellent local LLM runtime
-- The open-source community for inspiration and tools
-- All contributors who help improve this project
-
-## 📞 Support
-
-- 📫 **Issues**: [GitHub Issues](https://github.com/sashasmith-syber/nexus_spider_agent/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/sashasmith-syber/nexus_spider_agent/discussions)
-
-## 🗺️ Roadmap
-
-- [ ] Multi-database support (PostgreSQL, MySQL)
-- [ ] Web UI dashboard
-- [ ] Query history and caching
-- [ ] Advanced security features
-- [ ] API endpoint support
-- [ ] Cloud LLM integration (optional)
-
----
-
-<div align="center">
-
-**Made with ❤️ by the Nexus Spider Agent Team**
-
-⭐ Star this repository if you find it helpful!
-
-</div>
+- Built for use with [LM Studio](https://lmstudio.ai/)
+- Inspired by the need for privacy-focused AI tools
