@@ -4,7 +4,7 @@ Get started with Nexus Spider Agent in minutes!
 
 ## Prerequisites
 
-1. **Python 3.7+** - Check with `python --version`
+1. **Python 3.10+** - Check with `python --version`
 2. **LM Studio** - Download from [https://lmstudio.ai/](https://lmstudio.ai/)
 3. **A Language Model** - Download a model in LM Studio (recommended: Mistral, Llama 2, or CodeLlama)
 
