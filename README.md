@@ -13,7 +13,7 @@ A lightweight, privacy-focused Python agent that connects to locally running LLM
 
 ## Prerequisites
 
-- Python 3.7 or higher
+- Python 3.10 or higher
 - [LM Studio](https://lmstudio.ai/) installed and running locally
 - A language model loaded in LM Studio (e.g., Mistral, Llama, etc.)
 
